@@ -1,85 +1,68 @@
 import React, { useState } from 'react';
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../actions/user"
 import {
-    MDBContainer,
-    MDBCol,
-    MDBRow,
     MDBBtn,
     MDBIcon,
     MDBInput,
-    // MDBCheckbox,
-    MDBCard,
-    MDBCardBody,
-    MDBCardImage
+    MDBCheckbox,
+    MDBCardLink,
+    MDBCardText
 }
     from 'mdb-react-ui-kit';
-
-
-async function loginUser(credentials) {
-    return fetch('http://localhost:4000/api/v1/login', {
-        method: 'POST'
-    });
-}
-
-function Login() {
+import { Link, useNavigate } from 'react-router-dom';
+    
+function Login(props) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const handleLogin = async e => {
-        const user = await loginUser({
-            email,
-            password
-        });
-        console.log(user);
+    const handleLogin = e => {
+        e.preventDefault();
+
+        dispatch(loginUser(email, password));
+        navigate("/");
     }
-    
+
     return (
-        <MDBContainer fluid>
+        <>
+            <div className="text-center mb-3">
+                <p>Sign in with:</p>
 
-            <MDBCard className='text-black m-5' style={{ borderRadius: '25px' }}>
-                <MDBCardBody>
-                    <MDBRow>
-                        <MDBCol md='10' lg='6' className='order-1 order-lg-2 d-flex align-items-center'>
-                            <MDBCardImage src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp" fluid />
-                        </MDBCol>
-                        { !isLoggedIn ?(
-                            <MDBCol md='10' lg='6' className='order-2 order-lg-1 d-flex flex-column align-items-center'>
+                <div className='d-flex justify-content-between mx-auto' style={{ width: '50%' }}>
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='facebook-f' size="sm" />
+                    </MDBBtn>
 
-                                <p className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Login</p>
-                                <div className="d-flex flex-row align-items-center mb-4">
-                                    <MDBIcon fas icon="envelope me-3" size='lg' />
-                                    <MDBInput label='Your Email' id='form3' type='email' value={email} onChange={(e)=>setEmail(e.target.value)} />
-                                </div>
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='twitter' size="sm" />
+                    </MDBBtn>
 
-                                <div className="d-flex flex-row align-items-center mb-4">
-                                    <MDBIcon fas icon="lock me-3" size='lg' />
-                                    <MDBInput label='Password' id='form4' type='password' value={password} onChange={(e)=>setPassword(e.target.value)} />
-                                </div>
-                                {/* <div className="d-flex justify-content-between mx-4 mb-4">
-                                    <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Remember me' />
-                                    <a href="!#">Forgot password?</a>
-                                </div> */}
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='google' size="sm" />
+                    </MDBBtn>
 
-                                {/* <div className='mb-4'>
-                                    <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Subscribe to our newsletter' />
-                                </div> */}
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='github' size="sm" />
+                    </MDBBtn>
+                </div>
 
-                                <MDBBtn className='mb-4' size='lg' onClick={handleLogin}>Login</MDBBtn>
+                <p className="text-center mt-3">or:</p>
+            </div>
+            <form onSubmit={handleLogin}>
+                <MDBInput wrapperClass='mb-4' label='Email address' type='email' value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <MDBInput wrapperClass='mb-4' label='Password' type='password' value={password} onChange={(e) => setPassword(e.target.value)} required/>
 
-                            </MDBCol>
-                        ) : (
-                            <MDBCol>
-                                <p className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">User is logged in</p>
-                            </MDBCol>
-                        )
-                        }
-                        
-                    </MDBRow>
-                </MDBCardBody>
-            </MDBCard>
+                <div className="d-flex justify-content-between mx-4 mb-4">
+                    <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Remember me' />
+                    <Link to="/users/forgotpassword">Forgot password</Link>
+                </div>
 
-        </MDBContainer>
-    );
-}
+                <MDBBtn className="mb-4 w-100" type="submit">Login</MDBBtn>
+                <MDBCardText className="text-center">Not a member? <MDBCardLink role='button' onClick={()=>{props.handleJustifyClick("/register")}}><Link to="/register">Register</Link></MDBCardLink></MDBCardText>
+            </form>
+        </>
+)}
 
 export default Login;

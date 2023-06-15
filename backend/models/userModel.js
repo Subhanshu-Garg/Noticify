@@ -37,10 +37,18 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     },
-    role: {
-        type: String,
-        default: "user",
-    },
+    adminOf: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Organization"
+        }
+    ],
+    userOf: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Organization"
+        }
+    ],
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 });
@@ -49,7 +57,7 @@ userSchema.pre("save", async function(next) {
     if(!this.isModified("password")) {
         next();
     }
-    this.password = await bcrypt.hash(this.password,saltRounds);
+    this.password = await bcrypt.hash(this.password, saltRounds);
 });
 
 userSchema.methods.comparePassword = async function(enteredPassword) {
@@ -72,6 +80,17 @@ userSchema.methods.getJWT = function() {
     });
 };
 
+userSchema.methods.beAdmin = async function(organizationID) {
+    this.adminOf.push(organizationID);
+    await this.save();
+
+    return this;
+}
+
+userSchema.methods.addAdmin = async function(userID) {
+    this.userOf.push
+    await this.save();
+}
 
 const User = mongoose.model("User", userSchema);
 

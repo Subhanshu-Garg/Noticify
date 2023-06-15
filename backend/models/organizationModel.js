@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import catchAsyncError from "../middleware/catchAsyncError.js";
 
 const organizationSchema = new mongoose.Schema({
     organizationName: {
@@ -9,25 +8,24 @@ const organizationSchema = new mongoose.Schema({
         max: 30,
         unique: true,
     },
-    admins: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        }
-    ],
     joinRequests: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         }
     ],
-    users: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-    ],
+    // users: [
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "User",
+    //     }
+    // ],
+    // admins: [
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "User",
+    //     }
+    // ],
     notices: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -37,9 +35,9 @@ const organizationSchema = new mongoose.Schema({
 });
 
 organizationSchema.methods.sendJoinRequest = async function(userId) {
-    if(!(this.joinRequests.includes(userId) || this.users.includes(userId))){
+    if(!(this.joinRequests.includes(userId))){
         this.joinRequests.push(userId);
-        this.save();
+        await this.save();
         return true;
     }  else {
         return false;
@@ -48,7 +46,6 @@ organizationSchema.methods.sendJoinRequest = async function(userId) {
 
 organizationSchema.methods.approveUser = async function (userId) {
     if(this.joinRequests.includes(userId)){
-        this.users.push(userId);
         this.joinRequests.remove(userId);
         await this.save();
         return true;

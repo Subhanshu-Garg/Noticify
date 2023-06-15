@@ -9,12 +9,17 @@ export const isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
     if (!token) {
         const error = new Error("Please login or signup.");
         error.status = 401;
-        return next(new Error(error));
+        return next(new AppError("Please login or register",401));
     }
     else {
         const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decodedData.id);
+        const user = await User.findById(decodedData.id);
 
+        // if(user == null) {
+        //     return next(new AppError("User not found", 404));
+        // }
+
+        req.user = user;
         next();
     }
 });
@@ -28,7 +33,7 @@ export const isUserAdmin = catchAsyncError(async (req, res, next) => {
         return next(new AppError("Organization not found", 404));
     }
 
-    if (!organization.admins.includes(user._id)) {
+    if (!user.adminOf.includes(organizationID)) {
         return next(new AppError("You are not authorized to perform this action", 403));
     }
 
@@ -36,15 +41,15 @@ export const isUserAdmin = catchAsyncError(async (req, res, next) => {
     next();
 });
 
-export const authorizeRoles = (role) => {
-    return (req, res, next) => {
-        if (role != req.user.role) {
-            const error = new Error(`Role: ${req.user.role} not allowed to access this.`);
-            error.status = 403;
-            return next(error);
-        }
-        else {
-            next();
-        }
-    }
-}
+// export const authorizeRoles = (role) => {
+//     return (req, res, next) => {
+//         if (role != req.user.role) {
+//             const error = new Error(`Role: ${req.user.role} not allowed to access this.`);
+//             error.status = 403;
+//             return next(error);
+//         }
+//         else {
+//             next();
+//         }
+//     }
+// }

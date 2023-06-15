@@ -6,11 +6,12 @@ import Organization from "../models/organizationModel.js";
 //createNotice ---- admin
 export const createNotice = catchAsyncError(async function (req, res, next) {
     req.body.createdBy = req.user.id;
+
     const notice = await Notice.create(req.body);
     req.organization.addNotice(notice._id);
     res.status(201).json({
         message: "Notice created successfully.",
-        data: notice,
+        notice,
     });
 });
 
@@ -23,7 +24,7 @@ export const getAllNotices = catchAsyncError(async function (req, res, next) {
     } else {
         res.status(200).json({
             message: "Found all Notices successfully.",
-            data: notices,
+            notices,
         });
     }
 });
@@ -80,7 +81,7 @@ export const getNotice = catchAsyncError(async function (req, res, next) {
 // });
 
 export const updateNotice = catchAsyncError(async function (req, res, next) {
-    const noticeId = req.params.id;
+    const noticeId = req.params.noticeId;
     const updates = req.body;
     const updatedNotice = await Notice.findByIdAndUpdate(noticeId, updates, {
         new: true,
@@ -97,7 +98,7 @@ export const updateNotice = catchAsyncError(async function (req, res, next) {
 });
 
 export const deleteNotice = catchAsyncError(async function (req, res, next) {
-    const noticeId = req.params.id;
+    const noticeId = req.params.noticeId;
     const deletedNotice = await Notice.findByIdAndDelete(noticeId);
     req.organization.notices.remove(noticeId);
     await req.organization.save();

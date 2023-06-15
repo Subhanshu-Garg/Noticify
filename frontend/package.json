@@ -17,12 +17,14 @@
     "react": "^18.2.0",
     "react-alert": "^7.0.3",
     "react-alert-template-basic": "^1.0.2",
+    "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.43.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.0",
     "react-scripts": "5.0.1",
+    "react-select": "^5.7.3",
     "responsive-navbar-react": "^1.2.1",
     "web-vitals": "^2.1.4"
   },
@@ -49,5 +51,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "allowedHosts": [
+    "localhost",
+    "localhost"
+  ],
+  "proxy": "http://localhost:4000"
 }

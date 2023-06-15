@@ -45,15 +45,16 @@ export const loginUser = catchAsyncError(async (req, res, next) => {
 
 
 export const logoutUser = catchAsyncError(async (req, res, next) => {
-
-    res.cookie("token", null, {
-        expires: new Date(Date.now()),
-        httpOnly: true
-    });
-    res.status(200).json({
-        success: true,
-        message: "Logged Out"
-    });
+    if(req.cookies.token) {
+        res.clearCookie("token");
+        res.status(200).json({
+            success: true,
+            message: "Logged Out"
+        });
+    }
+    else {
+        next(new AppError("User is already logged out.",400))
+    }
 });
 
 export const forgotPassword = catchAsyncError(async (req, res, next) => {
@@ -137,7 +138,7 @@ export const getAllUser = catchAsyncError(async (req, res, next) => {
 export const getMe = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
         success: true,
-        me: req.user
+        user: req.user
     });
 });
 

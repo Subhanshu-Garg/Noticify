@@ -1,70 +1,91 @@
 import React from 'react';
+import { useState } from 'react';
 import {
     MDBBtn,
-    MDBContainer,
     MDBRow,
     MDBCol,
-    MDBCard,
-    MDBCardBody,
-    MDBCardImage,
     MDBInput,
     MDBIcon,
+    MDBCheckbox
 }
     from 'mdb-react-ui-kit';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { registerUser } from '../../actions/user';
 // import { useForm } from "react-hook-form";
 
 
 
 function Register() {
+    const [fname, setFirstName] = useState("");
+    const [lname, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            alert("Password and Confirm Password mismatch.");
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+        }
+        else {
+            dispatch(registerUser(fname, lname, email, password));
+            navigate("/");
+        }
+    }
     return (
-        <MDBContainer fluid>
+        <>
+            <div className="text-center mb-3">
+                <p>Sign up with:</p>
 
-            <MDBCard className='text-black m-5' style={{ borderRadius: '25px' }}>
-                <MDBCardBody>
-                    <MDBRow>
-                        <MDBCol md='10' lg='6' className='order-2 order-lg-1 d-flex flex-column align-items-center'>
+                <div className='d-flex justify-content-between mx-auto' style={{ width: '40%' }}>
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='facebook-f' size="sm" />
+                    </MDBBtn>
 
-                            <p classNAme="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Register</p>
-                            <form>
-                                {/* {error && <span>{error}</span>} */}
-                                <div className="d-flex flex-row align-items-center mb-4 ">
-                                    <MDBIcon fas icon="user me-3" size='lg' />
-                                    <MDBInput label='First Name' id='form1' type='text' className='w-100' /*{...register('firstName')*/ required/>
-                                </div>
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='twitter' size="sm" />
+                    </MDBBtn>
 
-                                <div className="d-flex flex-row align-items-center mb-4 ">
-                                    <MDBIcon fas icon="user me-3" size='lg' />
-                                    <MDBInput label='Last Name' id='form2' type='text' className='w-100' /*{...register('lastName')*/ required/>
-                                </div>
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='google' size="sm" />
+                    </MDBBtn>
 
-                                <div className="d-flex flex-row align-items-center mb-4">
-                                    <MDBIcon fas icon="envelope me-3" size='lg' />
-                                    <MDBInput label='Your Email' id='form3' type='email' /*{...register('email')></MDBInput>}*/ required />
-                                </div>
+                    <MDBBtn tag='a' color='none' className='m-1' style={{ color: '#1266f1' }}>
+                        <MDBIcon fab icon='github' size="sm" />
+                    </MDBBtn>
+                </div>
 
-                                <div className="d-flex flex-row align-items-center mb-4">
-                                    <MDBIcon fas icon="lock me-3" size='lg' />
-                                    <MDBInput label='Password' id='form4' type='password' /*{...register('password')}*/ required/>
-                                </div>
-                                <div className="d-flex flex-row align-items-center mb-4">
-                                    <MDBIcon fas icon="lock me-3" size='lg' />
-                                    <MDBInput label='Confirm Password' id='form5' type='password' /*{...register('confirmPassword')}*/ required/>
-                                </div>
+                <p className="text-center mt-3">or:</p>
+            </div>
+            <form onSubmit={handleRegister}>
+            <MDBRow>
+                <MDBCol col='6'>
+                    <MDBInput wrapperClass='mb-4' label='First name' type='text' value={fname} onChange={(e) => setFirstName(e.target.value)} required/>
+                </MDBCol>
 
-                                <MDBBtn className='mb-4' size='lg' type='submit'>{false ? '...' : 'Register'}</MDBBtn>
+                <MDBCol col='6'>
+                    <MDBInput wrapperClass='mb-4' label='Last name' type='text' value={lname} onChange={e => setLastName(e.target.value)} required/>
+                </MDBCol>
+            </MDBRow>
+            <MDBInput wrapperClass='mb-4' label='Email' type='email' value={email} onChange={e => setEmail(e.target.value)} required/>
+            <MDBInput wrapperClass='mb-4' label='Password' type='password' value={password} onChange={e => setPassword(e.target.value)} required/>
+            <MDBInput wrapperClass='mb-4' label='Confirm Password' type='password' value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required/>
 
-                            </form>
-                        </MDBCol>
+            <div className='d-flex justify-content-center mb-4'>
+                <MDBCheckbox name='flexCheck' id='flexCheckDefault' label='I have read and agree to the terms' required/>
+            </div>
 
-                        <MDBCol md='10' lg='6' className='order-1 order-lg-2 d-flex align-items-center'>
-                            <MDBCardImage src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp' fluid />
-                        </MDBCol>
-
-                    </MDBRow>
-                </MDBCardBody>
-            </MDBCard>
-
-        </MDBContainer>
+            <MDBBtn type='submit' className="mb-4 w-100">Register</MDBBtn>
+            </form>
+        </>
     );
 }
 
