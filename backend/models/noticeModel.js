@@ -4,6 +4,7 @@ const noticeSchema = new mongoose.Schema({
     title: {
         type: String,
         required: [true, "Please enter title."],
+        max: 30,
         trim: true
     },
     notice: {
@@ -12,7 +13,7 @@ const noticeSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -22,6 +23,11 @@ const noticeSchema = new mongoose.Schema({
     expiryDate: {
         type: Date,
         default: new Date(Date.now() + 7*24*60*60*1000)
+    },
+    noticeOf: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Organization",
+        required: [true, "Please enter the organization for which notice is"]
     }
 });
 

@@ -22,6 +22,8 @@ function Login(props) {
         e.preventDefault();
 
         dispatch(loginUser(email, password));
+        setEmail("");
+        setPassword("");
         navigate("/");
     }
 

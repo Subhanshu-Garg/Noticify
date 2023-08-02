@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 function MyProfile() {
 
     const { user } = useSelector(state => state.user);
-    console.log(user);
     const name = user.fname + " " + user.lname;
     return (
         <>

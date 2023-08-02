@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MDBBtn, MDBContainer, MDBTypography, MDBRow, MDBCol } from "mdb-react-ui-kit";
 import Select from "react-select";
-import { getAllOrganizations, joinOrganization } from "../../actions/organization";
+import { getAllOrganizations, sendJoinOrganizationRequest } from "../../actions/organization";
 
 export default function JoinOrganization() {
     const [selectedOrganization, setSelectedOrganization] = useState(null);
@@ -24,7 +24,8 @@ export default function JoinOrganization() {
 
     const handleSendJoinRequest = (e) => {
         e.preventDefault();
-        dispatch(joinOrganization(selectedOrganization.value));
+        dispatch(sendJoinOrganizationRequest(selectedOrganization.value));
+        setSelectedOrganization(null);
     }
 
     return (

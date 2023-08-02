@@ -32,14 +32,29 @@ export const isUserAdmin = catchAsyncError(async (req, res, next) => {
     if (!organization) {
         return next(new AppError("Organization not found", 404));
     }
-
     if (!user.adminOf.includes(organizationID)) {
+        return next(new AppError("You are not authorized to perform this action", 403));
+    }
+    req.organization = organization;
+    next();
+});
+
+export const isUserMember = catchAsyncError(async (req, res, next) => {
+    const user = req.user;
+    const organizationID = req.params.organizationID;
+
+    const organization = await Organization.findById(organizationID);
+    if(!organization) {
+        return next(new AppError("Organization not found", 404));
+    }
+
+    if(!user.adminOf.includes(organizationID) && !user.userOf.includes(organizationID)) {
         return next(new AppError("You are not authorized to perform this action", 403));
     }
 
     req.organization = organization;
     next();
-});
+})
 
 // export const authorizeRoles = (role) => {
 //     return (req, res, next) => {

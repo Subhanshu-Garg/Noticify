@@ -37,6 +37,11 @@ function Register() {
         }
         else {
             dispatch(registerUser(fname, lname, email, password));
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
             navigate("/");
         }
     }

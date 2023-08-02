@@ -1,12 +1,15 @@
 import React from "react";
+import { MDBFooter } from "mdb-react-ui-kit";
 
 function Footer() {
-  const year = new Date().getFullYear();
-  return (
-    <footer style={{height: "12px"}}>
-      <p>Copyright ⓒ {year}</p>
-    </footer>
-  );
+  <MDBFooter bgColor='light' className='text-center text-lg-left'>
+      <div className='text-center p-3' style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}>
+        &copy; {new Date().getFullYear()} Copyright:{' '}
+        <a className='text-dark' href='/'>
+          Noticify
+        </a>
+      </div>
+  </MDBFooter>
 }
 
 export default Footer;

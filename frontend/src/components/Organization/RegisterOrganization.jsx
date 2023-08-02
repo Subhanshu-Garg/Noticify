@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { getOrganizationsOfAdmin, getOrganizationsOfUser, registerOrganization } from "../../actions/organization";
+import {  registerOrganization } from "../../actions/organization";
 import { MDBInput, MDBBtn,MDBCardLink, MDBContainer, MDBTypography, MDBRow, MDBCol } from "mdb-react-ui-kit";
 
 function RegisterOrganization() {
@@ -9,9 +9,8 @@ function RegisterOrganization() {
     const handleRegisterOrganization = (e) => {
         e.preventDefault();
         dispatch(registerOrganization(organizationName));
-        dispatch(getOrganizationsOfAdmin());
-        dispatch(getOrganizationsOfAdmin());
-        dispatch(getOrganizationsOfUser());
+        setOrganizationName("");
+
     }
 
     return (

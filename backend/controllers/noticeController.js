@@ -7,8 +7,13 @@ import Organization from "../models/organizationModel.js";
 export const createNotice = catchAsyncError(async function (req, res, next) {
     req.body.createdBy = req.user.id;
 
-    const notice = await Notice.create(req.body);
-    req.organization.addNotice(notice._id);
+    const notice = await Notice.create({
+        title: req.body.title,
+        notice: req.body.notice,
+        createdBy: req.user.id,
+        noticeOf: req.params.organizationID
+    });
+    // req.organization.addNotice(notice._id);
     res.status(201).json({
         message: "Notice created successfully.",
         notice,
@@ -18,7 +23,8 @@ export const createNotice = catchAsyncError(async function (req, res, next) {
 
 export const getAllNotices = catchAsyncError(async function (req, res, next) {
     const organizationID = req.params.organizationID;
-    const notices = (await Organization.findById(organizationID).populate("notices")).notices;
+    const notices = await Notice.find({noticeOf: organizationID});
+    notices.reverse();
     if(notices.length === 0){
         return next(new AppError("No notices found for the organization", 404));
     } else {
@@ -32,10 +38,11 @@ export const getAllNotices = catchAsyncError(async function (req, res, next) {
 
 //delete all Notice - dangerous routes - Admin.
 export const deleteAllNotices = catchAsyncError(async function (req, res) {
-    const organization = req.organization;
-    const result = await Notice.deleteMany({ _id: { $in: organization.notices } });
-    organization.notices = [];
-    await organization.save();
+    // const organization = req.organization;
+    const organizationID = req.params.organizationID;
+    const result = await Notice.deleteMany({ noticeOf: organizationID });
+    // organization.notices = [];
+    // await organization.save();
     res
         .status(200)
         .json({ message: "Notices deleted successfully.", data: result });
@@ -43,15 +50,17 @@ export const deleteAllNotices = catchAsyncError(async function (req, res) {
 
 export const getNotice = catchAsyncError(async function (req, res, next) {
     const organizationID = req.params.organizationID;
-    const noticeId = req.params.id;
-    const notice = (await Organization.findById(organizationID).populate({
-        path: "notices",
-        match: { _id: noticeId }
-    })).notices[0];
+    const noticeId = req.params.noticeId;
+    const notice = await Notice.findById(noticeId).populate("createdBy");
+    // const notice = (await Organization.findById(organizationID).populate({
+    //     path: "notices",
+    //     match: { _id: noticeId }
+    // })).notices[0];
     if (notice) {
         res.status(200).json({
+            success: true,
             message: "Notice found successfully.",
-            data: notice,
+            notice,
         });
     } else {
         next(new AppError("Notice not found!", 404));
@@ -91,6 +100,7 @@ export const updateNotice = catchAsyncError(async function (req, res, next) {
         return next(new AppError("Notice not found with given ID", 404));
     } else {
         res.status(200).json({
+            success: true,
             message: "Notice updated successfully",
             data: updatedNotice,
         });
@@ -100,14 +110,15 @@ export const updateNotice = catchAsyncError(async function (req, res, next) {
 export const deleteNotice = catchAsyncError(async function (req, res, next) {
     const noticeId = req.params.noticeId;
     const deletedNotice = await Notice.findByIdAndDelete(noticeId);
-    req.organization.notices.remove(noticeId);
-    await req.organization.save();
-        if (!deletedNotice) {
-            return next(new AppError("Notice not found with given ID", 404));
-        } else {
-            res.status(200).json({
-                message: "Notice deleted successfully",
-                data: deletedNotice,
-            });
-        }
+    // req.organization.notices.remove(noticeId);
+    // await req.organization.save();
+    if (!deletedNotice) {
+        return next(new AppError("Notice not found with given ID", 404));
+    } else {
+        res.status(200).json({
+            success: true,
+            message: "Notice deleted successfully",
+            deletedNotice,
+        });
+    }
 })

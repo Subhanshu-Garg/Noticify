@@ -1,0 +1,36 @@
+.scrollBar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.scrollBar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 100px;
+}
+/* Track */
+.scrollBar::-webkit-scrollbar-track {
+  visibility: hidden;
+}
+
+
+/* Handle on hover */
+.scrollBar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.tabScroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  display: inline-flex;
+}
+
+.tabScroller::-webkit-scrollbar {
+  height: 3px;
+}
+.tabScroller::-webkit-scrollbar-thumb {
+  background: #3B71CA;
+  border-radius: 100px;
+}
+.tabScroller::-webkit-scrollbar-track {
+  background: #9FA6B2;
+}

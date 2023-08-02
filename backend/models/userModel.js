@@ -80,17 +80,22 @@ userSchema.methods.getJWT = function() {
     });
 };
 
-userSchema.methods.beAdmin = async function(organizationID) {
-    this.adminOf.push(organizationID);
-    await this.save();
 
-    return this;
+userSchema.methods.addOrganization = async function(organizationID, role) {
+    if(this.adminOf.includes(organizationID) || this.userOf.includes(organizationID)){
+        return false;
+    }
+    if(role === "admin") {
+        this.adminOf.push(organizationID);
+        this.save();
+    } else if(role === "user") {
+        this.userOf.push(organizationID);
+        this.save();
+    }
+    return true;
 }
 
-userSchema.methods.addAdmin = async function(userID) {
-    this.userOf.push
-    await this.save();
-}
+
 
 const User = mongoose.model("User", userSchema);
 

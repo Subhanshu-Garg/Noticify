@@ -1,41 +1,18 @@
 import { createReducer } from "@reduxjs/toolkit";
 const initialState = {};
 
-export const registerOrganizationReducer = createReducer(initialState, {
+export const organizationReducer = createReducer(initialState, {
     RegisterOragnizationRequest: (state) => {
         state.loading = true;
     },
     RegisterOrganizationSuccess: (state, action) => {
         state.loading = false;
-        state.organization = action.payload;
+        state.organizationsOfAdmin.push(action.payload);
     },
     RegisterOrganaizationFailure: (state, action) => {
         state.loading = false;
         state.error = action.payload;
     },
-    clearErrors: (state) => {
-        state.error = null;
-    },
-});
-
-export const joinOrganizationReducer = createReducer(initialState,{
-    JoinOrganizationRequest: (state) => {
-        state.loading = true;
-    },
-    JoinOrganizationSuccess: (state, action) => {
-        state.loading = false;
-        state.message = action.payload;
-    },
-    JoinOrganizationFailure: (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-    },
-    clearErrors: (state) => {
-        state.error = null;
-    },
-});
-
-export const getOrganizationsReducer = createReducer(initialState, {
     GetAllOrganizationsRequest: (state) => {
         state.loading = true;
     },
@@ -72,4 +49,50 @@ export const getOrganizationsReducer = createReducer(initialState, {
     clearErrors: (state) => {
         state.error = null;
     },
-})
+});
+
+export const sendJoinOrganizationRequestReducer = createReducer(initialState,{
+    sendJoinOrganizationRequestRequest: (state) => {
+        state.loading = true;
+    },
+    sendJoinOrganizationRequestSuccess: (state, action) => {
+        state.loading = false;
+        state.message = action.payload;
+    },
+    sendJoinOrganizationRequestFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+    },
+    clearErrors: (state) => {
+        state.error = null;
+    },
+});
+
+export const processJoinOrganizationRequestReducer = createReducer(initialState,{
+    acceptJoinOrganizationRequest: (state) => {
+        state.loading = true;
+    },
+    acceptJoinOrganizationSuccess: (state, action) => {
+        state.loading = false;
+        state.message = action.payload;
+    },
+    acceptJoinOrganizationFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload
+    },
+    rejectJoinOrganizationRequest: (state) => {
+        state.loading = true;
+    },
+    rejectJoinOrganizationSuccess: (state, action) => {
+        state.loading = false;
+        state.message = action.payload;
+    },
+    rejectJoinOrganizationFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload
+    },
+
+    clearErrors: (state) => {
+        state.error = null;
+    },
+});

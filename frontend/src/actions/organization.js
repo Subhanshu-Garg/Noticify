@@ -24,25 +24,45 @@ export const registerOrganization = (organizationName) => async (dispatch) => {
     }
 };
 
-export const joinOrganization = (organizationID) => async (dispatch) => {
+export const sendJoinOrganizationRequest = (organizationID) => async (dispatch) => {
     try {
         dispatch({
-            type: "JoinOrganizationRequest"
+            type: "sendJoinOrganizationRequestRequest"
         });
 
         const data = await axios.post(`/api/v1/organizations/${organizationID}/join`);
 
         dispatch({
-            type: "JoinOrganizationSuccess",
+            type: "JoinOrganizationSuccessRequest",
             payload: data.message
         })
     } catch (error) {
         dispatch({
-            type: "JoinOrganizationFailure",
+            type: "JoinOrganizationFailureRequest",
             payload: error.response.data.message
         })
     }
 };
+
+export const acceptJoinOrganizationRequest = (organizationID, userID) => async (dispatch) => {
+    try {
+        dispatch({
+            type: "acceptJoinOrganizationRequest"
+        });
+
+        const data = await axios.post(`/api/v1/organizations/${organizationID}/accept/${userID}`);
+
+        dispatch({
+            type: "acceptJoinOrganizationSuccess",
+            payload: data.message
+        })
+    } catch (error) {
+        dispatch({
+            type: "acceptJoinOrganizationFailure",
+            payload: error.response.data.message
+        })
+    }
+}
 
 export const getAllOrganizations = () => async (dispatch) => {
     try {

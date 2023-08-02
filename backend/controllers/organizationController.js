@@ -1,14 +1,16 @@
 import catchAsyncError from "../middleware/catchAsyncError.js";
 import Organization from "../models/organizationModel.js";
+import User from "../models/userModel.js";
 import AppError from "../utils/AppError.js";
 
 export const registerOrganization = catchAsyncError(async (req, res, next) => {
     const organizationName = req.body.organizationName;
     const organization = await Organization.create({
         organizationName,
+        admins: [req.user]
     });
     const admin = req.user;
-    admin.beAdmin(organization._id);
+    admin.addOrganization(organization._id, "admin");
 
     res.status(201).json({
         success: true,
@@ -30,7 +32,7 @@ export const getOrganizations = catchAsyncError(async (req, res, next) => {
             _id: {$in: req.user.userOf}
         }
     }
-    const organizations = await Organization.find(query);
+    const organizations = await Organization.find(query).populate("users").populate("admins").populate("joinRequests");
     if(organizations.length == 0){
         return next(new AppError("No organization found!", 404));
     } else {
@@ -79,18 +81,36 @@ export const sendJoinRequest = catchAsyncError(async (req, res, next) => {
     }
 });
 
+
+//Need to reconsider it.
 export const approveJoinRequest = catchAsyncError(async (req, res, next) => {
+    const userID = req.params.userID;
+    // const user = User.findById(userID);
+    // console.log(user);
+    const admin = req.user;
+    const organization = req.organization;
+
+    await User.findByIdAndUpdate(userID, { $push: {userOf: organization._id}})
+    await organization.approveUser(userID, "user");
+    // await user.addOrganization(organization._id, "user");
+    //addOrganization was not working, I don't know why thatswhy i implemented findbyid and update.
+    
+
+    res.status(200).json({
+        success:true,
+        message: "Succefully approved join request."
+    })
+});
+
+export const rejectJoinRequest = catchAsyncError(async (req, res, next) => {
     const userID = req.params.userID;
     const admin = req.user;
     const organization = req.organization;
-    if(await organization.approveUser(userID) && await user.addUser(userID)){
-        //Need to write something for sending a notification to the user whose request is accepted.
-        res.status(200).json({
-            success: true,
-            message: "Succefully approved join request."
-        })
-    } else {
-        return next(new AppError("This users join request doesn't exist.",404));
-    }
-    
-});
+
+    await organization.rejectJoinRequest(userID);
+
+    res.status(200).json({
+        success: true,
+        message: "Successfully rejected join request."
+    })
+})

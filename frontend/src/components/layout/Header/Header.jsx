@@ -13,14 +13,9 @@ import {
     MDBDropdown,
     MDBDropdownToggle,
     MDBDropdownMenu,
-    MDBDropdownItem,
-    MDBModal,
-    MDBModalBody,
-    MDBModalHeader,
-    MDBModalDialog,
-    MDBModalContent,
+    MDBDropdownItem
 } from 'mdb-react-ui-kit';
-import LoginRegister from '../../User/LoginRegister';
+// import LoginRegister from '../../User/LoginRegister';
 import { logoutUser } from '../../../actions/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -66,7 +61,9 @@ export default function Header() {
                                     <MDBIcon color="light" fas icon="user-alt" />
                                 </MDBDropdownToggle>
                                 <MDBDropdownMenu>
-                                    <MDBDropdownItem link href='/users/me'>My Profile</MDBDropdownItem>
+                                    <MDBDropdownItem link>
+                                        <Link to='/users/me'>My Profile</Link>
+                                    </MDBDropdownItem>
                                     <MDBDropdownItem link>Settings</MDBDropdownItem>
                                     <MDBDropdownItem divider />
                                     <MDBDropdownItem link onClick={handleLogout}>Logout<MDBIcon fas icon="sign-out-alt" /></MDBDropdownItem>
