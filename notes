@@ -1,12 +1,8 @@
-Method to Register/login a user(Anybody can see)
-Method to Register a organization(Only after user have logged In or show a button but if user is not logged in request him to first register as a user or redirect them to register user)
-Method to Join a organization(Only after user has been registered with ourself.)
-    Method to Send a Request to the organization
-    Method to Accept a Request by the admin of organization
-
-
-
-
-Resolve {
-    Find why organization request giving data.data not directly data.organization in organization.js in actions/organizations
-}
+Features bucket:
+ - Private organizations
+ - Need accept/decline for subscription
+ - Create Organization/Notice from frontend
+ - Update Organization/Notice from frontend
+ - Delete Organization/Notice from frontend
+ - Notification for request of subscription
+ - Transfer required collections in Postgres

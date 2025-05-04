@@ -1,0 +1,16 @@
+const EVENTS = {
+    NEW_NOTICE: 'NEW_NOTICE',
+    UPDATE_NOTICE: 'UPDATE_NOTICE',
+    DELETE_NOTICE: 'DELETE_NOTICE'
+}
+
+const CHANNELS = {
+    NOTICE_BROADCAST: 'NOTICE_BROADCAST'
+}
+
+const WSS = {
+    EVENTS,
+    CHANNELS
+}
+
+export default WSS
