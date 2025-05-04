@@ -2,11 +2,9 @@ import mongoose from "mongoose";
 import NoticeSchema from "../schemas/Notice.Schema.mjs";
 import * as httpContext from 'express-http-context'
 import MemberShipModel from "./MemberShip.Model.mjs";
-import { clients } from "../webSocket.mjs";
 import HTTP from "../constants/Http.Constants.mjs";
 import AppError from "../utils/AppError.mjs";
-import redisClients from "../redisPubSub.mjs";
-import WSS from "../constants/WebSocket.Constant.mjs";
+import RedisPubSubModel from "./RedisPubSub.Model.mjs";
 
 const Notice = new mongoose.model('Notice', NoticeSchema)
 
@@ -115,8 +113,5 @@ async function DeleteNoticeById(noticeId) {
 }
 
 async function BroadCastNotice(notice, type) {
-    await redisClients.publisher.publish(WSS.CHANNELS.NOTICE_BROADCAST, JSON.stringify({
-        type,
-        notice 
-    }))
+    await RedisPubSubModel.PublishToOrg(notice.orgId, { type, notice })
 }

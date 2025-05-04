@@ -2,9 +2,10 @@ import { WebSocketServer } from "ws";
 import UserModel from "./models/User.Model.mjs";
 import MemberShipModel from "./models/MemberShip.Model.mjs";
 import cookie from 'cookie'
+import RedisPubSubModel from "./models/RedisPubSub.Model.mjs";
 
 const wss = new WebSocketServer({ noServer: true })
-export const clients = new Map()
+const clients = new Map()
 
 wss.on('connection', async (ws, request) => {
     const cookies = cookie.parse(request.headers.cookie || '');
@@ -18,6 +19,9 @@ wss.on('connection', async (ws, request) => {
             user, 
             orgIds
         })
+        for (const orgId of orgIds) {
+            RedisPubSubModel.SubscribeToOrg(orgId, clients)
+        }
     } catch (err) {
         ws.close(4001, 'Invalid token');
         return;
@@ -28,6 +32,10 @@ wss.on('connection', async (ws, request) => {
     })
 
     ws.on('close', () => {
+        const { orgIds = [] } = clients.get(ws)
+        for (const orgId of orgIds) {
+            RedisPubSubModel.UnsubscribeToOrg(orgId)
+        }
         clients.delete(ws)
     })
 })
