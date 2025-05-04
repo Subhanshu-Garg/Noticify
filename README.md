@@ -30,7 +30,7 @@ Noticify is a scalable, real-time WebSocket-based notification service for multi
 
 ## 🧩 Architecture
 
-plaintext
+```
 +-----------+       +------------+      +----------------------+
 |  Client A | <---> |  Replica 1 | <--> | Redis Pub/Sub        |
 +-----------+       +------------+      +----------------------+
@@ -38,7 +38,7 @@ plaintext
 +-----------+       +------------+                |
 |  Client B | <---> |  Replica 2 | <--------------+
 +-----------+       +------------+
-
+```
 
 * Clients connect to any replica via WebSocket.
 * Each replica subscribes to Redis channels based on connected clients’ orgIds.
