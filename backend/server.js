@@ -1,8 +1,9 @@
 import * as dotenv from 'dotenv' 
 dotenv.config({path: "./config/.env"});
-import app from "./app.js";
+import httpServer from "./app.js";
 import { connectDatabase } from './config/database.js';
 import cloudinary from "cloudinary";
+import wss from './webSocket.mjs';
 
 //Uncaught exception
 
@@ -12,12 +13,9 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 })
 
-// dotenv.config();
-
-
+dotenv.config();
 
 connectDatabase();
-
 
 cloudinary.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -26,10 +24,16 @@ cloudinary.v2.config({
 })
 
 const PORT = process.env.PORT;
-const server = app.listen(PORT,function(){
-    console.log(`Server is running on the port:${PORT}`);
+
+httpServer.on('upgrade', (req, socket, head) => {
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req);
+    });
 });
 
+const server = httpServer.listen(PORT,() => {
+    console.info(`Server is running on the port:${PORT}`);
+});
 
 //Unhandled promise rejection
 

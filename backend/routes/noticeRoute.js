@@ -1,18 +1,19 @@
 import express from "express";
-import { getAllNotices, createNotice, deleteAllNotices,getNotice, updateNotice, deleteNotice  } from "../controllers/noticeController.js";
-import { isAuthenticatedUser, isUserAdmin, isUserMember } from "../middleware/auth.js";
+import { isAuthenticatedUser } from "../middleware/auth.js";
+import catchAsyncError from "../middleware/catchAsyncError.js";
+import NoticeController from "../controllers/Notice.Controller.mjs";
 
 
 const router = express.Router();
 
-router.route("/organizations/:organizationID/notices")
-    .get(isAuthenticatedUser, isUserMember, getAllNotices)
-    .post(isAuthenticatedUser, isUserAdmin,  createNotice)
-    .delete(isAuthenticatedUser, isUserAdmin, deleteAllNotices);
+router.route("/notices")
+    .get(isAuthenticatedUser, catchAsyncError(NoticeController.GetNotices))
+    .post(isAuthenticatedUser, catchAsyncError(NoticeController.CreateNotice))
+    // .delete(isAuthenticatedUser, isUserAdmin, deleteAllNotices);
 
-router.route("/organizations/:organizationID/notices/:noticeId")
-    .get(isAuthenticatedUser,isUserMember, getNotice)
-    .patch(isAuthenticatedUser, isUserAdmin, updateNotice)
-    .delete(isAuthenticatedUser, isUserAdmin, deleteNotice);
+router.route("/notices/:noticeId")
+    .get(isAuthenticatedUser, catchAsyncError(NoticeController.GetNotice))
+    .patch(isAuthenticatedUser, catchAsyncError(NoticeController.UpdateNotice))
+    .delete(isAuthenticatedUser, catchAsyncError(NoticeController.DeleteNotice));
 
 export default router;
