@@ -70,6 +70,7 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
       } catch (error) {
         set({ 
           notices: [],
+          unreadCount: 0,
           error: error instanceof Error ? error.message : 'Failed to fetch notices', 
           isLoadingNotices: false 
         });
