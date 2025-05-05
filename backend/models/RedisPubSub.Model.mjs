@@ -37,7 +37,7 @@ async function SubscribeToOrg(orgId, clientsMap) {
             if (ws.readyState !== ws.OPEN) {
                 continue
             }
-            if (!orgIds.includes(notice.orgId.toString())) {
+            if (!orgIds.includes(notice?.orgId?.toString())) {
                 continue
             }
             ws.send(JSON.stringify({

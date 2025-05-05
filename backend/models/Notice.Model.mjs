@@ -60,7 +60,7 @@ async function GetNotices(query = {}) {
 
 async function GetNoticeById(noticeId) {
     const user = httpContext.get('user')
-    const notice = await Notice.findById(noticeId).populate('org', '_id name')
+    const notice = await Notice.findById(noticeId).populate('org', '_id name').lean()
 
     if(!notice) {
         throw new AppError('Notice not found', HTTP.STATUS_CODE.NOT_FOUND)
@@ -90,7 +90,7 @@ async function UpdateNoticeById(noticeId, updateData) {
     const updatedNotice = await Notice.findByIdAndUpdate(noticeId, updateData, {
         new: true,
         runValidators: true,
-    })
+    }).lean()
 
     updatedNotice.orgId = notice.orgId
     updatedNotice.orgName = notice.orgName
@@ -107,7 +107,7 @@ async function DeleteNoticeById(noticeId) {
         throw new AppError('Not authorized', HTTP.STATUS_CODE.UNAUTHORIZED)
     }
 
-    const deletedNotice = await Notice.findByIdAndDelete(noticeId)
+    const deletedNotice = await Notice.findByIdAndDelete(noticeId).lean()
     console.info('Notice deleted')
     return deletedNotice
 }

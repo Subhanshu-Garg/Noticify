@@ -32,7 +32,6 @@ async function GetUserByEmail(email) {
         console.error("User not found with the given email:", email);
         throw new AppError("User not found with the given email", HTTP.STATUS_CODE.NOT_FOUND);
     }
-    console.info("User found successfully:", user);
     return user;
 }
 
@@ -42,7 +41,6 @@ async function GetUserById(userId) {
         console.error("User not found with the given ID:", userId);
         throw new AppError("User not found with the given ID", HTTP.STATUS_CODE.NOT_FOUND);
     }
-    console.info("User found successfully:", user);
     return user;
 }
 
@@ -78,7 +76,6 @@ async function LoginUser(email, password) {
         console.error("Invalid email or password");
         throw new AppError("Invalid email or password", HTTP.STATUS_CODE.UNAUTHORIZED);
     }
-    console.info("User logged in successfully:", user);
     return user;
 }
 
@@ -88,7 +85,6 @@ async function IsUserLoggedIn(token) {
     }
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     const user = await GetUserById(decodedData.id)
-    console.info("User logged in successfully:", user);
     return user
 }
 
