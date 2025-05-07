@@ -1,8 +1,13 @@
 import { createClient } from "redis";
 import WSS from "../constants/WebSocket.Constant.mjs";
+import configs from "../config/config.mjs";
 
-const Publisher = createClient();
-const Subscriber = createClient();
+const Publisher = createClient({
+    url: configs.REDIS_URL
+});
+const Subscriber = createClient({
+    url: configs.REDIS_URL
+});
 
 
 await Publisher.connect();

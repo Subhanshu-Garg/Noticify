@@ -4,7 +4,8 @@ const {
     DB_URI, 
     JWT_SECRET, 
     JWT_EXPIRE ,
-    COOKIE_EXPIRE
+    COOKIE_EXPIRE,
+    REDIS_URL
 } = process.env
 
 
@@ -14,7 +15,8 @@ const REQUIRED_CONFIGS = [
     'DB_URI', 
     'JWT_SECRET',
     'JWT_EXPIRE',
-    'COOKIE_EXPIRE'
+    'COOKIE_EXPIRE',
+    'REDIS_URL'
 ]
 
 REQUIRED_CONFIGS.map(configKey => {
@@ -30,7 +32,8 @@ const configs = {
     DB_URI,
     JWT_SECRET,
     JWT_EXPIRE,
-    COOKIE_EXPIRE
+    COOKIE_EXPIRE,
+    REDIS_URL
 }
 
 export default configs
