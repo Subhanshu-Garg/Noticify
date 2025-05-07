@@ -1,9 +1,9 @@
-import * as dotenv from 'dotenv' 
-dotenv.config({path: "./config/.env"});
-import httpServer from "./app.js";
-import { connectDatabase } from './config/database.js';
-import cloudinary from "cloudinary";
+import 'dotenv/config'
+import httpServer from "./app.mjs";
+import { connectDatabase } from './config/database.mjs';
+// import cloudinary from "cloudinary";
 import wss from './webSocket.mjs';
+import configs from './config/config.mjs';
 
 //Uncaught exception
 
@@ -13,17 +13,16 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 })
 
-dotenv.config();
 
 connectDatabase();
 
-cloudinary.v2.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-    api_key: process.env.CLOUDINARY_API_KEY, 
-    api_secret: process.env.CLOUDINARY_API_SECRET
-})
+// cloudinary.v2.config({
+//     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+//     api_key: process.env.CLOUDINARY_API_KEY, 
+//     api_secret: process.env.CLOUDINARY_API_SECRET
+// })
 
-const PORT = process.env.PORT;
+const PORT = configs.PORT;
 
 httpServer.on('upgrade', (req, socket, head) => {
     wss.handleUpgrade(req, socket, head, (ws) => {

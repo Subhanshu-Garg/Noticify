@@ -3,6 +3,7 @@ import UserSchema from "../schemas/User.Schema.mjs";
 import jwt from 'jsonwebtoken';
 import AppError from "../utils/AppError.mjs";
 import HTTP from "../constants/Http.Constants.mjs";
+import configs from "../config/config.mjs";
 
 export const User = new mongoose.model("User", UserSchema);
 
@@ -83,7 +84,7 @@ async function IsUserLoggedIn(token) {
     if (!token) {
         throw new AppError('Please login or register', HTTP.STATUS_CODE.UNAUTHORIZED)
     }
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedData = jwt.verify(token, configs.JWT_SECRET);
     const user = await GetUserById(decodedData.id)
     return user
 }

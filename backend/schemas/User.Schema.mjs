@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 const saltRounds = 10;
 import jwt from "jsonwebtoken";
 import crypto from 'crypto';
+import configs from "../config/config.mjs";
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -59,8 +60,8 @@ UserSchema.methods.getResetPasswordToken = function() {
 
 // JWT TOKEN
 UserSchema.methods.getJWT = function() {
-    return jwt.sign({id:this._id},process.env.JWT_SECRET,{
-        expiresIn: process.env.JWT_EXPIRE,
+    return jwt.sign({id:this._id},configs.JWT_SECRET,{
+        expiresIn: configs.JWT_EXPIRE,
     });
 };
 
