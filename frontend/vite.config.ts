@@ -19,4 +19,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: "dist",             // Default output folder
+    sourcemap: mode !== "production" ? true : false,  // Optional source maps in dev only
+    emptyOutDir: true,          // Clears dist before build
+  },
 }));

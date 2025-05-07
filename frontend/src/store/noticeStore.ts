@@ -1,9 +1,7 @@
 
 import { create } from 'zustand';
-import { useAuthStore } from './authStore';
-import { useOrganizationStore } from './organizationStore';
 import nodeHttp from '@/lib/nodeHttp';
-import CONFIG from '@/configs/config';
+import configs from '@/configs/config';
 
 export interface Notice {
   _id: string;
@@ -147,7 +145,7 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
         socket.close();
       }
       // In a real app, replace with actual WebSocket URL
-      socket = new WebSocket(`${CONFIG.WEB_SOCKET}`);
+      socket = new WebSocket(`${configs.WEB_SOCKET}`);
 
       socket.onopen = () => {
         console.info('Socket is open!')

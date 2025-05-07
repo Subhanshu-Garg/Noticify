@@ -1,8 +1,8 @@
+import configs from "@/configs/config";
 import axios from "axios";
-import Cookie from "node_modules/@types/js-cookie";
 
 const nodeHttp = axios.create({
-    baseURL: 'http://localhost:4000',
+    baseURL: configs.BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },

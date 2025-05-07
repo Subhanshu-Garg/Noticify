@@ -1,7 +1,7 @@
 
-const CONFIG = {
-    BASE_URL: 'http://localhost:4000',
-    WEB_SOCKET: 'ws://localhost:4000'
+const configs = {
+    BASE_URL: import.meta.env.VITE_BE_ENDPOINT,
+    WEB_SOCKET: import.meta.env.VITE_WS_ENDPOINT
 }
 
-export default CONFIG
+export default configs
