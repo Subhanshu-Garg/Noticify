@@ -2,6 +2,9 @@ import HTTP from "../constants/Http.Constants.mjs";
 import AppError from "../utils/AppError.mjs";   
 
 export function errorMiddleware(err, req, res, next)  {
+    if (res.headersSent) {
+        return next(err); 
+    }
     err.statusCode = err.statusCode || 500;
     err.message = err.message || "Internal Server Error";
 
