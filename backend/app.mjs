@@ -15,7 +15,6 @@ import healthCheckRoute from "./routes/HealthCheck.Router.mjs"
 // import jwt from "jsonwebtoken";
 
 const app = express();
-console.log('Allowed cors origin:', configs.ALLOWED_CORS_ORIGIN)
 app.use(cors({
     origin(origin, callback) {
       // Allow requests with no origin (e.g. mobile apps, curl, etc.)

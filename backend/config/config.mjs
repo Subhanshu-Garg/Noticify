@@ -23,7 +23,6 @@ REQUIRED_CONFIGS.map(configKey => {
         process.exit(1)
     }
 })
-console.info('configs in:', ALLOWED_CORS_ORIGIN)
 
 const configs = {
     ALLOWED_CORS_ORIGIN: ALLOWED_CORS_ORIGIN.split(','),
