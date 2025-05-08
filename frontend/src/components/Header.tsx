@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { useNoticeStore } from "@/store/noticeStore";
 import { useUIStore } from "@/store/uiStore";
@@ -16,14 +15,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Moon, Sun, Bell, LogOut, Settings, User } from "lucide-react";
 import NotificationBell from "./NotificationBell";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
   const { user, logout } = useAuthStore();
   const { unreadCount } = useNoticeStore();
   const { theme, setTheme } = useUIStore();
   const navigate = useNavigate();
-  
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
   
   const handleLogout = () => {
     logout();
@@ -43,6 +42,50 @@ const Header = () => {
       .substring(0, 2);
   };
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const NavLinks = () => (
+    <>
+      <Link 
+        to="/" 
+        className={cn(
+          "text-sm font-medium hover:text-primary",
+          isActive('/') && "text-primary"
+        )}
+      >
+        Dashboard
+      </Link>
+      <Link 
+        to="/organizations" 
+        className={cn(
+          "text-sm font-medium hover:text-primary",
+          isActive('/organizations') && "text-primary"
+        )}
+      >
+        Organizations
+      </Link>
+      <Link 
+        to="/notices" 
+        className={cn(
+          "text-sm font-medium hover:text-primary relative",
+          isActive('/notices') && "text-primary"
+        )}
+      >
+        Notices
+        {unreadCount > 0 && (
+          <Badge 
+            variant="destructive" 
+            className="absolute -top-2 -right-4 h-5 w-5 flex items-center justify-center p-0 text-[10px]"
+          >
+            {unreadCount}
+          </Badge>
+        )}
+      </Link>
+    </>
+  );
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
@@ -53,23 +96,7 @@ const Header = () => {
         
         {user && (
           <nav className="hidden md:flex items-center gap-6">
-            <Link to="/" className="text-sm font-medium hover:text-primary">
-              Dashboard
-            </Link>
-            <Link to="/organizations" className="text-sm font-medium hover:text-primary">
-              Organizations
-            </Link>
-            <Link to="/notices" className="text-sm font-medium hover:text-primary relative">
-              Notices
-              {unreadCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-4 h-5 w-5 flex items-center justify-center p-0 text-[10px]"
-                >
-                  {unreadCount}
-                </Badge>
-              )}
-            </Link>
+            <NavLinks />
           </nav>
         )}
         

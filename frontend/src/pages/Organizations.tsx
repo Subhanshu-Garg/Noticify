@@ -33,14 +33,16 @@ const Organizations = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Organizations</h1>
           <p className="text-muted-foreground">
             Subscribe to organizations to receive their notices
           </p>
         </div>
-        <CreateOrganizationDialog />
+        <div className="w-full md:w-auto">
+          <CreateOrganizationDialog />
+        </div>
       </div>
 
       <div className="space-y-6">

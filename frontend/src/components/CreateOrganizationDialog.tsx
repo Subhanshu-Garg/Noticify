@@ -59,9 +59,9 @@ export function CreateOrganizationDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4" />
-          Create Organization
+        <Button className="w-full h-9 min-h-[36px] px-2 py-1 text-xs md:w-auto md:h-10 md:px-3 md:py-1.5 md:text-sm">
+          <Plus className="h-3 w-3 mr-1 md:h-3.5 md:w-3.5 md:mr-1.5" />
+          <span className="whitespace-nowrap">Create Organization</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
