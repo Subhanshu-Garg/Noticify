@@ -127,7 +127,7 @@ const NoticeDetail = ({ noticeId, onClose }: NoticeDetailProps) => {
             <div className="flex flex-col gap-2">
               {currentNotice.attachments.map((attachment) => (
                 <Button 
-                  key={attachment.id} 
+                  key={attachment.url} 
                   variant="outline" 
                   className="justify-start gap-2 w-full text-left"
                   asChild

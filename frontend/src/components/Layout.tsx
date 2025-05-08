@@ -1,7 +1,7 @@
-
 import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "./Header";
+import BottomNav from "./BottomNav";
 import { useAuthStore } from "@/store/authStore";
 import { useNoticeStore } from "@/store/noticeStore";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -38,8 +38,6 @@ const Layout = ({ children, requiresAuth = false }: LayoutProps) => {
   }, [isAuthenticated, initWebSocket, disconnectWebSocket]);
 
   // Extract the notice ID from the URL path if we're on a notice detail page
-
-  
   const noticeId = location.pathname.match(/\/notices\/(.+)/)?.[1];
   if (noticeId && noticeId !== currentNoticeId) {
     selectNotice(noticeId);
@@ -50,9 +48,11 @@ const Layout = ({ children, requiresAuth = false }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow container py-6">
+      <main className="flex-grow container py-6 pb-24 md:pb-6">
         {children || <Outlet />}
       </main>
+      
+      {isAuthenticated && <BottomNav />}
       
       <Dialog open={isNoticeModalOpen} onOpenChange={toggleNoticeModal}>
         <DialogContent className="sm:max-w-3xl">
