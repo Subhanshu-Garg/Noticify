@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import nodeHttp from '@/lib/nodeHttp';
 import configs from '@/configs/config';
@@ -9,15 +8,18 @@ export interface Notice {
   content: string;
   orgId: string;
   orgName: string;
-  createdAt: string;
-  isRead: boolean;
-  priority?: 'low' | 'medium' | 'high';
-  attachments?: {
-    id: string;
+  tags: string[];
+  attachments: {
     name: string;
     url: string;
   }[];
-  tags?: string[];
+  priority: 'high' | 'medium' | 'low';
+  isRead: boolean;
+  createdAt: string;
+  createdBy: {
+    _id: string;
+    name: string;
+  };
 }
 
 interface NoticeState {
@@ -26,6 +28,7 @@ interface NoticeState {
   currentNotice: Notice | null;
   isLoadingNotices: boolean;
   isLoadingCurrentNotice: boolean;
+  isLoadingCreatingNotice: boolean;
   unreadCount: number;
   error: string | null;
   fetchNotices: () => Promise<void>;
@@ -36,11 +39,12 @@ interface NoticeState {
   addNotice: (notice: Notice) => void;
   initWebSocket: () => void;
   disconnectWebSocket: () => void;
+  createNotice: (data: Partial<Notice>) => Promise<void>;
 }
 
 export const useNoticeStore = create<NoticeState>((set, get) => {
   let socket: WebSocket | null = null;
-  let reconnectInterval
+  let reconnectInterval;
 
   return {
     notices: [],
@@ -48,15 +52,15 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
     currentNotice: null,
     isLoadingNotices: false,
     isLoadingCurrentNotice: false,
+    isLoadingCreatingNotice: false,
     unreadCount: 0,
     error: null,
 
     fetchNotices: async () => {
       set({ isLoadingNotices: true, error: null });
       try {
-        // In a real app, replace with actual API call
         const response = await nodeHttp.get('/api/v1/notices');
-        const { data: { notices = [] } = {} } = response
+        const { data: { notices = [] } = {} } = response;
         
         const unreadCount = notices.filter((notice: Notice) => !notice.isRead).length;
         
@@ -86,8 +90,8 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
     getNotice: async (id) => {
       set({ isLoadingCurrentNotice: true, error: null });
       try {
-        const response = await nodeHttp.get(`/api/v1/notices/${id}`)
-        const { data: { notice = {} } = {} } = response
+        const response = await nodeHttp.get(`/api/v1/notices/${id}`);
+        const { data: { notice = {} } = {} } = response;
         
         if (!notice) {
           throw new Error('Notice not found');
@@ -108,8 +112,8 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
           isRead: true
         });
 
-        const { data: { success } } = response
-        // if (!success) throw Error('Unable to mark as read')
+        const { data: { success } } = response;
+        if (!success) throw Error('Unable to mark as read')
         
         set(state => {
           const notices = state.notices.map(notice => 
@@ -126,13 +130,12 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
         });
       } catch (error) {
         set({ error: error instanceof Error ? error.message : 'Failed to mark as read' });
-        throw error
+        throw error;
       }
     },
 
     addNotice: (notice) => {
       set(state => {
-        console.log('Add notice', notice)
         const notices = [notice, ...state.notices];
         const unreadCount = notices.filter(notice => !notice.isRead).length;
         
@@ -144,28 +147,27 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
       if (socket) {
         socket.close();
       }
-      // In a real app, replace with actual WebSocket URL
       socket = new WebSocket(`${configs.WEB_SOCKET}`);
 
       socket.onopen = () => {
-        console.info('Socket is open!')
-        clearInterval(reconnectInterval)
-      }
+        console.info('Socket is open!');
+        clearInterval(reconnectInterval);
+      };
 
       socket.onclose = () => {
-        console.info('Socket is closed!')
+        console.info('Socket is closed!');
         reconnectInterval = setInterval(() => {
           if (!socket || socket.readyState === WebSocket.CLOSED) {
-            get().initWebSocket()
+            get().initWebSocket();
           }
-        }, 3000)
-      }
+        }, 3000);
+      };
 
       socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        const newNotice: Notice = data.notice
-        get().addNotice(newNotice)
-      }
+        const data = JSON.parse(event.data);
+        const newNotice: Notice = data.notice;
+        get().addNotice(newNotice);
+      };
 
       socket.onerror = (error) => {
         console.error('WebSocket error:', error);
@@ -177,6 +179,23 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
       if (socket) {
         socket.close();
         socket = null;
+      }
+    },
+
+    createNotice: async (data) => {
+      set({ isLoadingCreatingNotice: true, error: null });
+      try {
+        const response = await nodeHttp.post("/api/v1/notices", data);
+        set(state => ({
+          notices: [response.data, ...state.notices],
+          isLoadingCreatingNotice: false,
+        }));
+      } catch (error) {
+        set({
+          error: error instanceof Error ? error.message : "Failed to create notice",
+          isLoadingCreatingNotice: false,
+        });
+        throw error;
       }
     }
   };

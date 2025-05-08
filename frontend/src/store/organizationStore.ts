@@ -12,16 +12,19 @@ export interface Organization {
 
 interface OrganizationState {
   organizations: Organization[];
+  adminOrganizations: Organization[];
   isLoading: boolean;
   error: string | null;
   fetchOrganizations: () => Promise<void>;
   subscribeToOrg: (orgId: string) => Promise<void>;
   unsubscribeFromOrg: (orgId: string) => Promise<void>;
+  fetchAdminOrganizations: () => Promise<void>;
   createOrganization: (name: string, description: string) => Promise<void>;
 }
 
 export const useOrganizationStore = create<OrganizationState>((set, get) => ({
   organizations: [],
+  adminOrganizations: [],
   isLoading: false,
   error: null,
 
@@ -41,6 +44,20 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
         isLoading: false 
       });
       throw error
+    }
+  },
+  fetchAdminOrganizations: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await nodeHttp.get("/api/v1/organizations?role=admin");
+      const data = response.data;
+      if (!data.success) throw new Error(data.message || 'Failed to fetch organizations');
+      const { organizations: adminOrganizations } = data
+      set({ adminOrganizations, isLoading: false });
+    } catch (error) {
+      console.error("Failed to fetch admin organizations:", error);
+    } finally {
+      set({ isLoading: false });
     }
   },
 

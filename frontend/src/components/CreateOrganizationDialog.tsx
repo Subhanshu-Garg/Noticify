@@ -5,16 +5,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 
 export function CreateOrganizationDialog() {
   const [open, setOpen] = useState(false);
@@ -65,14 +62,15 @@ export function CreateOrganizationDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent>
+        <Card>
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Create Organization</DialogTitle>
-            <DialogDescription>
+          <CardHeader>
+            <CardTitle>Create Organization</CardTitle>
+            <CardDescription>
               Create a new organization to manage notices and members.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -94,8 +92,12 @@ export function CreateOrganizationDialog() {
                 maxLength={200}
               />
             </div>
-          </div>
-          <DialogFooter>
+          
+          </CardContent>
+          <CardFooter className="gap-2">
+          <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create"}
+            </Button>
             <Button
               type="button"
               variant="outline"
@@ -103,12 +105,12 @@ export function CreateOrganizationDialog() {
               disabled={isSubmitting}
             >
               Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create"}
-            </Button>
-          </DialogFooter>
+            </Button>         
+          </CardFooter>
         </form>
+
+        </Card>
+        
       </DialogContent>
     </Dialog>
   );
