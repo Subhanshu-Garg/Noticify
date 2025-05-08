@@ -44,7 +44,7 @@ async function GetNotices(query = {}) {
 
     const notices = await Notice.find({
         org: {
-            $in: [orgIds]
+            $in: orgIds
         }
     }).skip(offset).limit(limit).sort({ createdAt: -1 }).populate('org', '_id name').lean()
     

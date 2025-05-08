@@ -19,16 +19,20 @@ const MemberShipModel = {
 
 export default MemberShipModel
 
-async function CreateMemberShip(userId, orgId, userRole) {
-    const memberShip = await MemberShip.create({
+async function CreateMemberShip(userId, orgId, userRole, session) {
+    const options = session ? { session } : {};
+    
+    const memberShip = await MemberShip.create([{
         org: orgId,
         user: userId,
         role: userRole
-    })
-    if (!memberShip) {
-        throw new AppError('Error creating membership', HTTP.STATUS_CODE.BAD_REQUEST)
+    }], options);
+
+    if (!memberShip || !memberShip[0]) {
+        throw new AppError('Error creating membership', HTTP.STATUS_CODE.BAD_REQUEST);
     }
-    return memberShip
+
+    return memberShip[0]; // return single document
 }
 
 async function GetMemberShipByUserIdOrgId(userId, orgId) {

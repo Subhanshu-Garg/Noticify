@@ -1,9 +1,9 @@
-
 import { useEffect } from "react";
 import { useOrganizationStore } from "@/store/organizationStore";
 import OrganizationCard from "@/components/OrganizationCard";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CreateOrganizationDialog } from "@/components/CreateOrganizationDialog";
 
 const Organizations = () => {
   const { organizations, fetchOrganizations, isLoading } = useOrganizationStore();
@@ -33,11 +33,14 @@ const Organizations = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Organizations</h1>
-        <p className="text-muted-foreground">
-          Subscribe to organizations to receive their notices
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Organizations</h1>
+          <p className="text-muted-foreground">
+            Subscribe to organizations to receive their notices
+          </p>
+        </div>
+        <CreateOrganizationDialog />
       </div>
 
       <div className="space-y-6">

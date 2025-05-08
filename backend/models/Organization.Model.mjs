@@ -20,16 +20,17 @@ export default OrganizationModel
 
 async function CreateOrganization(organizationData) {
     const user = httpContext.get('user')
-    await runTransaction(async() => {
-        const org = await Organization.create(organizationData)
+    let org
+    await runTransaction(async(session) => {
+        [org] = await Organization.create([organizationData], { session })
 
         if (!org) {
             throw new AppError('Organization not created', HTTP.STATUS_CODE.BAD_REQUEST)
         }
 
-        await MemberShipModel.CreateMemberShip(user._id, org._id, ROLES.MAP.ADMIN)
+        await MemberShipModel.CreateMemberShip(user._id, org._id, ROLES.MAP.ADMIN, session)
     })
-    return organizationData
+    return await GetOrganizationById(org._id)
 }
 
 async function GetOrganizations(query = {}) {
@@ -62,9 +63,11 @@ async function GetOrganizations(query = {}) {
 }
 
 async function GetOrganizationById(orgId) {
-    const org = await Organization.findById(orgId)
+    const user = httpContext.get('user')
+    const org = await Organization.findById(orgId).lean()
     if (!org) {
         throw new AppError('No organization found!', HTTP.STATUS_CODE.NOT_FOUND)
     }
+    org.isSubscribed = await MemberShipModel.IsUserMember(user._id, org._id, user.memberships)
     return org
 }
