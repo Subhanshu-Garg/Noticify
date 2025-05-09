@@ -1,9 +1,13 @@
-
 import { useEffect, useState } from "react";
+import { useOrganizationStore } from "@/store/organizationStore";
 import { useNoticeStore } from "@/store/noticeStore";
-import NoticeCard from "@/components/NoticeCard";
+import { CreateNoticeModal } from "@/components/CreateNoticeModal";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CheckCheck, RefreshCcw, Search, X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,131 +15,138 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCheck, ChevronDown, RefreshCcw, Search, X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { ChevronDown } from "lucide-react";
+import NoticeCard from "@/components/NoticeCard";
 
 const Notices = () => {
-  const { notices, fetchNotices, markAsRead, isLoadingNotices, unreadCount } = useNoticeStore();
-  const [filteredNotices, setFilteredNotices] = useState(notices);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
+  const { adminOrganizations, fetchAdminOrganizations, isLoading: isLoadingOrgs } = useOrganizationStore();
+  const { notices, isLoadingCreatingNotice: isLoadingNotices, fetchNotices, markAsRead } = useNoticeStore();
 
   useEffect(() => {
+    fetchAdminOrganizations();
     fetchNotices();
-  }, [fetchNotices]);
+  }, [fetchAdminOrganizations, fetchNotices]);
 
-  useEffect(() => {
-    let result = [...notices];
-
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        notice =>
-          notice.title.toLowerCase().includes(term) ||
-          notice.content.toLowerCase().includes(term) ||
-          notice.orgName.toLowerCase().includes(term) ||
-          (notice.tags && notice.tags.some(tag => tag.toLowerCase().includes(term)))
-      );
-    }
-
-    // Apply sorting
-    result.sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      
-      if (sortOrder === "newest") {
-        return dateB - dateA;
-      } else if (sortOrder === "oldest") {
-        return dateA - dateB;
-      } else if (sortOrder === "unread") {
-        return a.isRead === b.isRead ? 0 : a.isRead ? 1 : -1;
-      } else if (sortOrder === "priority") {
-        const priorityMap = { high: 3, medium: 2, low: 1 };
-        const priorityA = priorityMap[a.priority || "low"];
-        const priorityB = priorityMap[b.priority || "low"];
-        return priorityB - priorityA;
-      }
-      return 0;
-    });
-
-    setFilteredNotices(result);
-  }, [notices, searchTerm, sortOrder]);
+  const isAdmin = adminOrganizations.length > 0;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchNotices();
-    setIsRefreshing(false);
+    try {
+      await fetchNotices();
+      toast({
+        title: "Success",
+        description: "Notices refreshed successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to refresh notices",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleMarkAllAsRead = async () => {
-    if (unreadCount === 0) return;
-    
-    const unreadNotices = notices.filter(notice => !notice.isRead);
-    const promises = []
-    for (const notice of unreadNotices) {
-      promises.push(markAsRead(notice._id))
+    try {
+      const unreadNotices = notices.filter(notice => !notice.isRead);
+      const promises = []
+      for (const notice of unreadNotices) {
+        promises.push(markAsRead(notice._id))
+      }
+      await Promise.allSettled(promises)
+      toast({
+        title: "Success",
+        description: "All notices marked as read",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to mark notices as read",
+      });
     }
-    await Promise.allSettled(promises)
-    
-    toast({
-      title: "All notices marked as read",
-      description: `${unreadCount} notices have been marked as read`,
+  };
+
+  const clearSearch = () => setSearchTerm("");
+
+  const filteredNotices = notices
+    .filter(notice =>
+      notice?.title?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      notice?.content?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      notice?.orgName?.toLowerCase()?.includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case "newest":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case "oldest":
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case "unread":
+          return a.isRead === b.isRead ? 0 : a.isRead ? 1 : -1;
+        default:
+          return 0;
+      }
     });
-  };
 
-  const clearSearch = () => {
-    setSearchTerm("");
-  };
+  const unreadCount = notices.filter(notice => !notice.isRead).length;
 
-  const renderSkeletons = () => {
-    return Array(6)
+  const renderSkeletons = (count: number) => {
+    return Array(count)
       .fill(0)
       .map((_, idx) => (
-        <Card key={idx} className="p-6">
-          <Skeleton className="h-6 w-2/3 mb-3" />
-          <Skeleton className="h-4 w-1/3 mb-6" />
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-3/4" />
+        <Card key={idx} className="p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-6 w-36" />
+          </div>
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-10 w-full mt-2" />
         </Card>
       ));
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Notices</h1>
           <p className="text-muted-foreground">
-            View and manage all your notices
+            View and manage notices from your organizations
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="gap-2"
-          >
-            <RefreshCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleMarkAllAsRead}
-            disabled={unreadCount === 0}
-            className="gap-2"
-          >
-            <CheckCheck className="h-4 w-4" />
-            Mark All Read
-          </Button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="gap-2"
+            >
+              <RefreshCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleMarkAllAsRead}
+              disabled={unreadCount === 0}
+              className="gap-2"
+            >
+              <CheckCheck className="h-4 w-4" />
+              Mark All Read
+            </Button>
+          </div>
+          {isAdmin && (
+            <CreateNoticeModal onSuccess={fetchNotices} />
+          )}
         </div>
       </div>
 
@@ -170,20 +181,41 @@ const Notices = () => {
               <DropdownMenuRadioItem value="newest">Newest First</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="oldest">Oldest First</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="unread">Unread First</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="priority">Priority</DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {isLoadingNotices ? (
+      {isLoadingNotices || isLoadingOrgs ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {renderSkeletons()}
+          {renderSkeletons(3)}
         </div>
       ) : filteredNotices.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredNotices.map(notice => (
             <NoticeCard key={notice._id} notice={notice} />
+            // <Card key={notice._id} className="p-6">
+            //   <div className="flex items-center gap-3 mb-4">
+            //     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+            //       <span className="text-lg font-semibold text-primary">
+            //         {notice.organization.name[0].toUpperCase()}
+            //       </span>
+            //     </div>
+            //     <div>
+            //       <h3 className="font-semibold">{notice.organization.name}</h3>
+            //       <p className="text-sm text-muted-foreground">
+            //         {new Date(notice.createdAt).toLocaleDateString()}
+            //       </p>
+            //     </div>
+            //   </div>
+            //   <h4 className="font-semibold mb-2">{notice.title}</h4>
+            //   <p className="text-muted-foreground mb-4 line-clamp-3">{notice.content}</p>
+            //   {notice.expiry && (
+            //     <p className="text-sm text-muted-foreground">
+            //       Expires: {new Date(notice.expiry).toLocaleDateString()}
+            //     </p>
+            //   )}
+            // </Card>
           ))}
         </div>
       ) : (

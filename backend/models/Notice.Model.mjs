@@ -22,11 +22,12 @@ export default NoticeModel
 async function CreateNotice(noticeData) {
     const user = httpContext.get('user')
 
-    const isUserAdmin = await MemberShipModel.IsUserAdmin(user._id, noticeData.org)
+    const isUserAdmin = await MemberShipModel.IsUserAdmin(user._id, noticeData.orgId)
     if (!isUserAdmin) {
         throw new AppError('Not authorized to perform this action', HTTP.STATUS_CODE.UNAUTHORIZED)
     }
     noticeData.createdBy = user._id
+    noticeData.org = noticeData.orgId
     const createdNotice = await Notice.create(noticeData)
     const notice = await Notice.findById(createdNotice._id).populate('org', '_id name').lean()
     notice.orgId = notice.org._id
@@ -44,7 +45,7 @@ async function GetNotices(query = {}) {
 
     const notices = await Notice.find({
         org: {
-            $in: [orgIds]
+            $in: orgIds
         }
     }).skip(offset).limit(limit).sort({ createdAt: -1 }).populate('org', '_id name').lean()
     

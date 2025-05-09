@@ -5,7 +5,7 @@ async function runTransaction(transaction) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        result = await transaction();
+        result = await transaction(session);
         await session.commitTransaction();
         console.info("Transaction committed successfully.");
     } catch (error) {
