@@ -49,7 +49,9 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({ 
             error: error instanceof Error ? error.message : 'Login failed', 
-            isLoading: false 
+            isLoading: false,
+            isAuthenticated: false,
+            user: null
           });
         }
       },
@@ -74,13 +76,15 @@ export const useAuthStore = create<AuthState>()(
           console.error(error);
           set({ 
             error: error instanceof Error ? error.message : 'Registration failed', 
-            isLoading: false 
+            isLoading: false,
+            user: null,
+            isAuthenticated: false
           });
         }
       },
 
       logout: async () => {
-        await nodeHttp.get("/api/v1/logout")
+        await nodeHttp.get("/api/v1/logout").catch()
         set({ 
           user: null, 
           token: null, 
