@@ -8,7 +8,7 @@ import configs from './config/config.mjs';
 //Uncaught exception
 
 process.on("uncaughtException", (err) => {
-    console.log(`Error: ${err.message}`);
+    console.log(`Error: ${err.message}`, err);
     console.log('Shutting down the server due to unhandled rejections.');
     process.exit(1);
 })
@@ -37,7 +37,7 @@ const server = httpServer.listen(PORT,() => {
 //Unhandled promise rejection
 
 process.on("unhandledRejection", err => {
-    console.log(`Error: ${err.message}`);
+    console.log(`Error: ${err.message}`, err);
     console.log('Shutting down the server due to unhandled rejections.');
 
     server.close(() => {

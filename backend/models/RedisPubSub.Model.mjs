@@ -37,18 +37,13 @@ async function SubscribeToOrg(orgId, clientsMap) {
     Subscriber.subscribe(channel, (message) => {
         const { type,  notice } = JSON.parse(message)
 
-        for (const [ws, meta] of clientsMap.entries()) {
-            const { orgIds } = meta
-            if (ws.readyState !== ws.OPEN) {
-                continue
-            }
+        for (const client of clientsMap.values()) {
+            const { orgIds } = client.meta
             if (!orgIds.includes(notice?.orgId?.toString())) {
                 continue
             }
-            ws.send(JSON.stringify({
-                type,
-                notice 
-            }))
+
+            client.SendEvent({ type, notice })
         }
     })
 }

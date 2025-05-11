@@ -40,11 +40,14 @@ interface NoticeState {
   initWebSocket: () => void;
   disconnectWebSocket: () => void;
   createNotice: (data: Partial<Notice>) => Promise<void>;
+  initEventSource: () => void;
+  disconnectEventSource: () => void;
 }
 
 export const useNoticeStore = create<NoticeState>((set, get) => {
   let socket: WebSocket | null = null;
-  let reconnectInterval;
+  let reconnectInterval: NodeJS.Timeout | null = null
+  let eventSource: EventSource | null = null
 
   return {
     notices: [],
@@ -196,6 +199,33 @@ export const useNoticeStore = create<NoticeState>((set, get) => {
           isLoadingCreatingNotice: false,
         });
         throw error;
+      }
+    },
+
+    initEventSource: () => {
+      if (eventSource) {
+        eventSource.close()
+      }
+      eventSource = new EventSource(`${configs.BASE_URL}/api/v1/events`, {
+        withCredentials: true
+      })
+      
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const newNotice: Notice = data.notice;
+        get().addNotice(newNotice);
+      };
+
+      eventSource.onerror = (error) => {
+        console.error('Event source error:', error);
+        set({ error: 'Event source connection error' });
+      };
+    },
+
+    disconnectEventSource: () => {
+      if (eventSource) {
+        eventSource.close()
+        eventSource = null
       }
     }
   };

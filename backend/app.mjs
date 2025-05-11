@@ -12,6 +12,7 @@ import userRoute from "./routes/User.Router.mjs";
 import organizationRoute from "./routes/Organization.Router.mjs";
 import membershipRoute from "./routes/MemberShip.Router.mjs"
 import healthCheckRoute from "./routes/HealthCheck.Router.mjs"
+import serverSentEventsRoute from "./routes/ServerSentEvents.Router.mjs"
 // import jwt from "jsonwebtoken";
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/v1",noticeRoute);
 app.use("/api/v1",userRoute);
 app.use("/api/v1",organizationRoute);
 app.use("/api/v1",membershipRoute);
+app.use("/api/v1",serverSentEventsRoute);
 
 //middleware for error
 

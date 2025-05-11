@@ -3,6 +3,7 @@ import UserModel from "./models/User.Model.mjs";
 import MemberShipModel from "./models/MemberShip.Model.mjs";
 import cookie from 'cookie'
 import RedisPubSubModel from "./models/RedisPubSub.Model.mjs";
+import ClientClasses from "./classes/Client.Class.mjs";
 
 const wss = new WebSocketServer({ noServer: true })
 const clients = new Map()
@@ -15,10 +16,9 @@ wss.on('connection', async (ws, request) => {
         const user = await UserModel.IsUserLoggedIn(token)
         const memberships = await MemberShipModel.GetMemberShipsByUserId(user._id)
         const orgIds = memberships.map(membership => membership.org._id.toString())
-        clients.set(ws, {
-            user, 
-            orgIds
-        })
+
+        const client = new ClientClasses.WebSocketClient(ws, {user, orgIds})
+        clients.set(ws, client)
         for (const orgId of orgIds) {
             RedisPubSubModel.SubscribeToOrg(orgId, clients)
         }
@@ -32,7 +32,8 @@ wss.on('connection', async (ws, request) => {
     })
 
     ws.on('close', () => {
-        const { orgIds = [] } = clients.get(ws)
+        const client = clients.get(ws)
+        const { orgIds = [] } = client.meta
         for (const orgId of orgIds) {
             RedisPubSubModel.UnsubscribeToOrg(orgId)
         }

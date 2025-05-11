@@ -16,7 +16,7 @@ interface LayoutProps {
 
 const Layout = ({ children, requiresAuth = false }: LayoutProps) => {
   const { isAuthenticated } = useAuthStore();
-  const { initWebSocket, disconnectWebSocket, currentNoticeId, selectNotice } = useNoticeStore();
+  const { initWebSocket, disconnectWebSocket, initEventSource, disconnectEventSource, currentNoticeId, selectNotice } = useNoticeStore();
   const { isNoticeModalOpen, toggleNoticeModal } = useUIStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,13 +29,15 @@ const Layout = ({ children, requiresAuth = false }: LayoutProps) => {
   
   useEffect(() => {
     if (isAuthenticated) {
-      initWebSocket();
+      // initWebSocket();
+      initEventSource();
     }
     
     return () => {
-      disconnectWebSocket();
+      // disconnectWebSocket();
+      disconnectEventSource();
     };
-  }, [isAuthenticated, initWebSocket, disconnectWebSocket]);
+  }, [isAuthenticated, initEventSource, disconnectEventSource]);
 
   // Extract the notice ID from the URL path if we're on a notice detail page
   const noticeId = location.pathname.match(/\/notices\/(.+)/)?.[1];
