@@ -29,9 +29,6 @@ async function LoginUser(req, res, next) {
 }
 
 async function LogoutUser(req, res, next) {
-    if (!req.cookies.token) {
-        return next(new AppError("Please login or register", HTTP.STATUS_CODE.UNAUTHORIZED));
-    }
     res.clearCookie("token");
     res.status(200).json({
         success: true,

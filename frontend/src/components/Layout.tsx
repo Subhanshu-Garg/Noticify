@@ -45,7 +45,11 @@ const Layout = ({ children, requiresAuth = false }: LayoutProps) => {
     selectNotice(noticeId);
     toggleNoticeModal(true);
   }
-  console.log('Current notice id', currentNoticeId)
+
+  const handleCloseModal = () => {
+    toggleNoticeModal(false);
+    selectNotice(null);
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -58,7 +62,7 @@ const Layout = ({ children, requiresAuth = false }: LayoutProps) => {
       
       <Dialog open={isNoticeModalOpen} onOpenChange={toggleNoticeModal}>
         <DialogContent className="sm:max-w-3xl">
-          <NoticeDetail noticeId={currentNoticeId} onClose={() => toggleNoticeModal(false)} />
+          <NoticeDetail noticeId={currentNoticeId} onClose={handleCloseModal} />
         </DialogContent>
       </Dialog>
     </div>

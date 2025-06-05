@@ -16,7 +16,7 @@ import NoticeCard from "./NoticeCard";
 import { useUIStore } from "@/store/uiStore";
 
 const NotificationBell = () => {
-  const { notices, unreadCount, markAsRead, currentNotice } = useNoticeStore();
+  const { notices, unreadCount, selectNotice } = useNoticeStore();
   const { toggleNoticeModal } = useUIStore();
   const navigate = useNavigate();
 
@@ -26,6 +26,7 @@ const NotificationBell = () => {
 
   const handleNoticeClick = (id: string) => {
     toggleNoticeModal(true);
+    // selectNotice(id);
     navigate(`/notices/${id}`);
   };
 

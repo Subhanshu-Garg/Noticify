@@ -20,8 +20,8 @@ const NoticeCard = ({ notice, isPreview = false }: NoticeCardProps) => {
   const handleCardClick = () => {
     if (isPreview) return;
     toggleNoticeModal(true);
-    selectNotice(notice._id)
-    // navigate(`/notices/${notice.id}`);
+    // selectNotice(notice._id)
+    navigate(`/notices/${notice._id}`);
   };
 
   const getPriorityColor = (priority: string = 'medium') => {
