@@ -1,14 +1,33 @@
 import { createClient } from "redis";
-import { EventEmitter } from 'events'
 import WSS from "../constants/WebSocket.Constant.mjs";
 import configs from "../config/config.mjs";
 import MyRedisClient from "../classes/MockRedis.Class.mjs";
 
+const MAX_REDIS_RETRIES = 5;
+
 let Publisher = createClient({
-    url: configs.REDIS_URL
+    url: configs.REDIS_URL,
+    socket: {
+        reconnectStrategy: (retries) => {
+            if (retries > MAX_REDIS_RETRIES) {
+                return false
+            }
+            const delay = Math.min(retries * 200, 2000);
+            return delay;
+        }
+    }
 });
 let Subscriber = createClient({
-    url: configs.REDIS_URL
+    url: configs.REDIS_URL,
+    socket: {
+        reconnectStrategy: (retries) => {
+            if (retries > MAX_REDIS_RETRIES) {
+                return false
+            }
+            const delay = Math.min(retries * 200, 2000);
+            return delay;
+        }
+    }
 });
 
 Publisher.on('error', (err) => console.error('Redis Publisher Error:', err));
@@ -20,7 +39,7 @@ try {
 } catch (error) {
     console.info('Redis connection unsuccessful!', error)
     Publisher = new MyRedisClient()
-    Subscriber = Publisher
+    Subscriber = new MyRedisClient()
 }
 
 
