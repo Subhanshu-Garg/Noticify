@@ -1,17 +1,25 @@
 import { createClient } from "redis";
+import { EventEmitter } from 'events'
 import WSS from "../constants/WebSocket.Constant.mjs";
 import configs from "../config/config.mjs";
+import MyRedisClient from "../classes/MockRedis.Class.mjs";
 
-const Publisher = createClient({
+let Publisher = createClient({
     url: configs.REDIS_URL
 });
-const Subscriber = createClient({
+let Subscriber = createClient({
     url: configs.REDIS_URL
 });
 
+try {
+    await Publisher.connect();
+    await Subscriber.connect();
+} catch (error) {
+    console.info('Redis connection unsuccessful!', error)
+    Publisher = new MyRedisClient()
+    Subscriber = Publisher
+}
 
-await Publisher.connect();
-await Subscriber.connect();
 
 
 const RedisPubSubModel = {
