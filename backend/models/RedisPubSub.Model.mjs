@@ -11,6 +11,9 @@ let Subscriber = createClient({
     url: configs.REDIS_URL
 });
 
+Publisher.on('error', (err) => console.error('Redis Publisher Error:', err));
+Subscriber.on('error', (err) => console.error('Redis Subscriber Error:', err));
+
 try {
     await Publisher.connect();
     await Subscriber.connect();
